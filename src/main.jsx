@@ -3,6 +3,7 @@ import App from './App.jsx'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import ProducForm from './ProductForm.jsx'
+import { ProductProvider } from '../context/ProductProvider.jsx'
 
 
 const router = createBrowserRouter([
@@ -12,5 +13,7 @@ const router = createBrowserRouter([
 ])
 
 createRoot(document.getElementById('root')).render(
-    <RouterProvider router={router}/>
+    <ProductProvider>
+        <RouterProvider router={router}/>
+    </ProductProvider>
 )

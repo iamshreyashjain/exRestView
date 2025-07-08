@@ -1,101 +1,57 @@
-import axios from "axios";
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom";
+import { ProductContext, ProductProvider } from "../context/ProductProvider";
 
 export default function ProducForm() {
-
+    const { id } = useParams();
     const navigate = useNavigate();
-    const [update, setUpdate] = useState(false)
-    const { id } = useParams()
-    useEffect(() => {
-        if (id) {
-            const getProducts = async () => {
-                const resposne = await axios.get(`http://localhost:8080/products/${id}`)
-                setFormData(resposne.data)
-            }
-            setUpdate(true)
-            getProducts()
-        }
-    }, [id])
+    const [update, setUpdate] = useState(false);
 
+    const { formData, setFormData, getProductById, addProduct, updateProduct, resetFormData } = useContext(ProductContext);
 
-
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        price: '',
-        discountPercentage: '',
-        rating: '',
-        category: '',
-        thumbnail: '',
-        stock: '',
-        images: ''
-    })
-
-    const handleSubmit = async (e) => {
-        console.log('sub');
-        e.preventDefault();
-        if (formData?.title?.trim().length === 0) {
-            alert("Please Add Titlsse")
-            return;
-        }
-        try {
-            const resposne = await axios.post('http://localhost:8080/products', formData)
-            if (resposne) {
-                console.log('success')
-                setFormData({
-                    title: '',
-                    description: '',
-                    price: '',
-                    discountPercentage: '',
-                    rating: '',
-                    category: '',
-                    thumbnail: '',
-                    stock: '',
-                    images: ''
-                });
-                navigate('/')
-            }
-        }
-        catch (err) {
-            console.log(err)
-        }
+  useEffect(() => {
+    if (id) {
+      setUpdate(true);
+      getProductById(id);
     }
+  }, [id]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value })
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const handleUpdateSubmit = async (e) => {
-        console.log('upda');
-        e.preventDefault();
-        if (formData?.title?.trim().length === 0) {
-            alert("Please Add Title")
-            return;
-        }
-        try {
-            const resposne = await axios.put(`http://localhost:8080/products/${id}`, formData)
-            if (resposne) {
-                console.log('success')
-                setFormData({
-                    title: '',
-                    description: '',
-                    price: '',
-                    discountPercentage: '',
-                    rating: '',
-                    category: '',
-                    thumbnail: '',
-                    stock: '',
-                    images: ''
-                });
-                navigate('/')
-            }
-        }
-        catch (err) {
-            console.log(err)
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.title.trim().length === 0) {
+      alert("Please Add Title");
+      return;
     }
+    try {
+      await addProduct();
+      resetFormData();
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.title.trim().length === 0) {
+      alert("Please Add Title");
+      return;
+    }
+    try {
+      await updateProduct(id);
+      resetFormData();
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+    
+
 
     return (
         <>

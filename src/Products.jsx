@@ -1,46 +1,21 @@
-import { useEffect, useState } from "react"
-import axios from "axios"
+import { useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { MdDelete } from "react-icons/md";
+import { ProductContext } from "../context/ProductProvider";
+
 
 
 export default function Products() {
     const navigate = useNavigate()
-    const [products, setProdcuts] = useState([])
+
+    const { handleDelete, products} = useContext(ProductContext);    
     
     const handleClick = (item) => {
         navigate(`/form/${item.id}`)
     }
-
-    const handleDelete = async (item) => {
-        console.log(item.id)
-        try {
-            const response = await axios.delete(`http://localhost:8080/products/${item.id}`);
-            if (response) {
-                console.log("Deleted Successfully");
-
-                const newResponse = await axios.get("http://localhost:8080/products");
-                setProdcuts(newResponse.data);
-            }
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
-    useEffect(() => {
-        const getProducts = async () => {
-            try {
-                const resposne = await axios.get("http://localhost:8080/products")
-                console.log(resposne)
-                const { data } = resposne;
-                setProdcuts(data)
-            }
-            catch (err) {
-                console.log(err)
-            }
-        }
-        getProducts();
-    }, [])
+    const handleDeleteItem = (item) =>{
+        handleDelete(item.id)
+    }
 
     return (
         <>
@@ -51,7 +26,7 @@ export default function Products() {
                         <img src={item?.thumbnail} className="w-9/12 h-48" />
                         <div className="flex justify-around items-center">
                             <span className="text-green-600 font-semibold">{item?.title}</span>
-                            <MdDelete onClick={() => handleDelete(item)} className="text-red-600" size={22}> Click </MdDelete>
+                            <MdDelete onClick={() => handleDeleteItem(item)} className="text-red-600" size={22}> Click </MdDelete>
                             <button onClick={() => handleClick(item)} className="border border-blue-400  px-4 rounded-md "> Click </button>
                         </div>
 
